@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head> 
+    <meta charset="UTF-8">
+    <link rel = "stylesheet" href="Page.css"> 
+    <title>CourseFlowSync</title>
+</head>
+
+<body>
+    <div class="main-section">
+        <div class="Title">
+            <h1 style="font-size: 40px; color: #E6F6FC;">
+                Welcome to CourseFlowSync
+            </h1>
+            <h2>
+                Please enter a URL for searching: 
+            </h2>
+            <form class="Search">
+                <input class="URL"
+                       type="url"
+                       placeholder="Enter with URL"
+                       value="">
+            </form>
+            <a class="submit_URL"
+                   href="index.php" 
+                   style="margin-right: 71px;
+                   margin-left: 587px;
+                   margin-top: 18px;">Submit</a>
+                <a class="reset_URL"
+                   style="margin-left: 660px;
+                   margin-top: -34px;
+                   margin-bottom: auto;">Reset</a>
+            <script>
+                const puppeteer = require('puppeteer');
+
+                async function getVisual() {
+	try {
+		const URL = 'https://chattanooga.gov';
+		const browser = await puppeteer.launch();
+
+		const page = await browser.newPage();
+		await page.goto(URL);
+
+		await page.screenshot({ path: 'screenshot.png' });
+		await page.pdf({ path: 'page.pdf' });
+
+		await browser.close();
+	} catch (error) {
+		console.error(error);
+	}
+}
+
+getVisual(); 
+</script>
+        </div>
+       </div>
+</body>
+</html>
