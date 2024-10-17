@@ -1,0 +1,90 @@
+/* Apply the gradient from .grad to main-section */
+.main-section {
+    padding: 80px 40px;
+    border-radius: 24px;
+    width: 800px;
+    background: 
+        linear-gradient(#25dbf3,#25dbf3) center right / 30% 70px,
+        linear-gradient(#1fa2ff,#1fa2ff) bottom left / 40% 70px,
+        linear-gradient(#5533ff, #5533ff) top left / 30% 70px,
+        linear-gradient(#4553ff,#4553ff) top left / 60% 70px,
+        linear-gradient(#4f40ff,#4f40ff) top left / 100% 70px,
+        linear-gradient(150deg, #53f 15%, #05d5ff 70%, #a6ffcb 94%);
+    background-repeat: no-repeat;
+    background-color: #2C5AA0;
+    
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+body {
+    background-color: #f9f9fb;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-image: linear-gradient(-225deg, #FFFEFF 0%, #D7FFFE 100%);
+    font-family: system-ui, -apple-system, segoe ui, Ubuntu, Cantarell, sans-serif, Meiryo;
+    
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.Title h1 {
+    font-size: 40px;
+    color: #E6F6FC;
+    text-align: center;
+}
+
+.Title h2 {
+    font-size: 24px;
+    color: white;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.Search {
+    text-align: center;
+}
+
+.Course {
+    width: 100%;
+    max-width: 600px;
+    padding: 10px;
+    margin: 20px 0;
+    font-size: 16px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    outline: none;
+}
+
+.form-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.submit_course,
+.reset_URL {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: white;
+    text-align: center;
+    border-radius: 32px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.submit_course {
+    background-color: #0FB86D;
+}
+
+.reset_URL {
+    background-color: #EB6954;
+}
+
+.submit_course,
+.reset_URL:hover {
+    opacity: 0.6;
+}
