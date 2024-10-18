@@ -4,37 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Courses and Instructors</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Include Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js loaded first -->
     <style>
         body {
-            text-align: left; /* Default left alignment */
+            text-align: left;
         }
 
         h1, h2, p, table {
-            text-align: left; /* Ensure headings, paragraphs, and tables are left-aligned */
+            text-align: left;
         }
 
         .chart-container {
             width: 400px;
             height: 400px;
             margin: 20px 0;
-            display: block; /* Makes charts behave like block elements */
-            clear: both; /* Ensures charts don't overlap other content */
+            display: block;
+            clear: both;
         }
 
         table {
             margin-bottom: 20px;
             border-collapse: collapse;
-            width: 100%; /* Makes the table span the full width */
+            width: 100%;
         }
 
         table, th, td {
-            border: 1px solid black; /* Standard table border */
+            border: 1px solid black;
         }
 
         th, td {
             padding: 8px;
-            text-align: left; /* Left-align table content */
+            text-align: left;
         }
 
         canvas {
@@ -48,7 +48,7 @@
     <h1>Search Courses by Instructor</h1>
     <form method="GET">
         <label for="instructor">Instructor Name:</label>
-        <input type="text" id="instructor" name="instructor" placeholder="Enter instructor name">
+        <input type="text" id="instructor" name="instructor" placeholder="Enter instructor name" value="<?php echo htmlspecialchars($instructorFilter ?? '', ENT_QUOTES, 'UTF-8'); ?>">
         <input type="submit" value="Search">
     </form>
 
@@ -61,11 +61,16 @@
     // Autoload MongoDB library via Composer
     require 'vendor/autoload.php';
 
-    // Connect to MongoDB
-    $manager = new MongoDB\Driver\Manager("mongodb://mongodb:27017/course-flow-sync"); // Use the correct database name
+    use MongoDB\Client;
 
-    // Check if an instructor name is provided from the search
+    // Connect to MongoDB with the correct database name
+    $manager = new MongoDB\Driver\Manager("mongodb://mongodb:27017/course_flow_sync");
+
+    // Initialize $instructorFilter to an empty string if not set
     $instructorFilter = isset($_GET['instructor']) ? $_GET['instructor'] : '';
+
+    // Start form and display data
+    echo "<h1>Courses and Instructors</h1>";
 
     try {
         // Aggregation query with optional filtering by instructor name
@@ -106,16 +111,32 @@
         }
 
         $command = new MongoDB\Driver\Command([
-            'aggregate' => 'courses',
+            'aggregate' => 'courses', // collection name: courses
             'pipeline' => $pipeline,
             'cursor' => new stdClass()
         ]);
 
-        $cursor = $manager->executeCommand('course-flow-sync', $command); // Use the correct database name here
+        $cursor = $manager->executeCommand('course_flow_sync', $command);
 
-        echo "<h1>Courses and Instructors</h1>";
+        $results = [];
 
         foreach ($cursor as $result) {
+            $results[] = $result;
+        }
+
+        // Sort the instructors alphabetically by their name
+        usort($results, function($a, $b) {
+            return strcmp($a->instructorName, $b->instructorName);
+        });
+
+        $resultsFound = false;
+
+        foreach ($results as $result) {
+            $resultsFound = true;
+
+            // Sanitize instructor name for a valid HTML ID
+            $sanitizedInstructorName = preg_replace('/[^a-zA-Z0-9_]/', '_', $result->instructorName);
+
             echo "<h2>Instructor: " . htmlspecialchars($result->instructorName) . "</h2>";
             echo "<p>Total Students: " . htmlspecialchars($result->totalStudents) . "</p>";
 
@@ -131,40 +152,43 @@
             }
 
             // Add chart container with fixed size
-            echo "<div class='chart-container'><canvas id='chart-". htmlspecialchars($result->instructorName) ."'></canvas></div>";
+            echo "<div class='chart-container'><canvas id='chart-" . htmlspecialchars($sanitizedInstructorName) . "'></canvas></div>";
 
+            // Output the chart script
             echo "<script>
-            var ctx = document.getElementById('chart-". htmlspecialchars($result->instructorName) ."').getContext('2d');
-            var chart = new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: " . json_encode($courseTitles) . ",
-                    datasets: [{
-                        label: 'Enrollment',
-                        data: " . json_encode($courseEnrollments) . ",
-                        backgroundColor: [
-                            'rgba(255, 99, 132, 0.2)',
-                            'rgba(54, 162, 235, 0.2)',
-                            'rgba(255, 206, 86, 0.2)',
-                            'rgba(75, 192, 192, 0.2)',
-                            'rgba(153, 102, 255, 0.2)',
-                            'rgba(255, 159, 64, 0.2)'
-                        ],
-                        borderColor: [
-                            'rgba(255, 99, 132, 1)',
-                            'rgba(54, 162, 235, 1)',
-                            'rgba(255, 206, 86, 1)',
-                            'rgba(75, 192, 192, 1)',
-                            'rgba(153, 102, 255, 1)',
-                            'rgba(255, 159, 64, 1)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false
-                }
+            document.addEventListener('DOMContentLoaded', function () {
+                var ctx = document.getElementById('chart-". htmlspecialchars($sanitizedInstructorName) ."').getContext('2d');
+                var chart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: " . json_encode($courseTitles) . ",
+                        datasets: [{
+                            label: 'Enrollment',
+                            data: " . json_encode($courseEnrollments) . ",
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.2)',
+                                'rgba(54, 162, 235, 0.2)',
+                                'rgba(255, 206, 86, 0.2)',
+                                'rgba(75, 192, 192, 0.2)',
+                                'rgba(153, 102, 255, 0.2)',
+                                'rgba(255, 159, 64, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(153, 102, 255, 1)',
+                                'rgba(255, 159, 64, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
             });
             </script>";
 
@@ -181,9 +205,14 @@
             echo "</table><br>";
         }
 
+        if (!$resultsFound) {
+            echo "<p>No courses found or no instructor matches your query.</p>";
+        }
+
     } catch (MongoDB\Driver\Exception\Exception $e) {
         echo "Error: " . $e->getMessage();
     }
     ?>
 </body>
 </html>
+
