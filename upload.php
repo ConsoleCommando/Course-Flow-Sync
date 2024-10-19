@@ -13,12 +13,17 @@ use MongoDB\Client;
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['jsonFile'])) {
     $file = $_FILES['jsonFile']['tmp_name'];
 
-    // Read and decode JSON file
+    // Read the uploaded file
     $jsonData = file_get_contents($file);
+
+    // Add square brackets at the beginning and end of the file
+    $jsonData = '[' . $jsonData . ']'; // Wrap the entire JSON data with square brackets
+
+    // Decode JSON into associative array
     $data = json_decode($jsonData, true);  // Decode into associative array
 
     // Check if JSON decoding failed or if 'data' key is missing
-    if ($data === null || !is_array($data)) {
+    if ($data === null || !isset($data[0]['data'])) {
         die('Error: Invalid JSON structure or missing "data" key.');
     }
 
@@ -82,4 +87,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['jsonFile'])) {
     echo "No file uploaded.";
 }
 ?>
-
