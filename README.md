@@ -8,10 +8,5 @@ Steps to setup (Linux Mint 22 Docker):
 4. Enjoy the pie charts!
 
 Currently unused files:
-HeadPage,
-HeadPage.html,
-Page.css,
-Web_UI,
-process.php,
 scraped_data.json,
 selenium_scraper.py

@@ -16,8 +16,8 @@
     </form>
 
     <h1>Courses and Instructors</h1>
-
     <div class="grid-container">
+
     <?php
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
@@ -30,39 +30,29 @@
         $instructorFilter = isset($_GET['instructor']) ? $_GET['instructor'] : '';
 
         try {
+            // Aggregation pipeline with instructor filtering
             $pipeline = [
-                [
-                    '$group' => [
-                        '_id' => [
-                            'instructorName' => '$instructorName',
-                            'instructorId' => '$instructorBannerId'
-                        ],
-                        'totalStudents' => ['$sum' => '$enrollment'],
-                        'courses' => [
-                            '$push' => [
-                                'title' => '$courseTitle',
-                                'enrollment' => '$enrollment',
-                                'courseReferenceNumber' => '$courseReferenceNumber'
-                            ]
+                ['$group' => [
+                    '_id' => ['instructorName' => '$instructorName', 'instructorId' => '$instructorBannerId'],
+                    'totalStudents' => ['$sum' => '$enrollment'],
+                    'courses' => [
+                        '$push' => [
+                            'title' => '$courseTitle',
+                            'enrollment' => '$enrollment',
+                            'courseReferenceNumber' => '$courseReferenceNumber'
                         ]
                     ]
-                ],
-                [
-                    '$project' => [
-                        'instructorName' => '$_id.instructorName',
-                        'totalStudents' => 1,
-                        'courses' => 1,
-                        '_id' => 0
-                    ]
-                ]
+                ]],
+                ['$project' => [
+                    'instructorName' => '$_id.instructorName',
+                    'totalStudents' => 1,
+                    'courses' => 1,
+                    '_id' => 0
+                ]]
             ];
 
             if (!empty($instructorFilter)) {
-                array_unshift($pipeline, [
-                    '$match' => [
-                        'instructorName' => new MongoDB\BSON\Regex($instructorFilter, 'i')
-                    ]
-                ]);
+                array_unshift($pipeline, ['$match' => ['instructorName' => new MongoDB\BSON\Regex($instructorFilter, 'i')]]);
             }
 
             $command = new MongoDB\Driver\Command([
@@ -118,7 +108,7 @@
                 echo "<script>
                     document.addEventListener('DOMContentLoaded', function () {
                         var ctx = document.getElementById('chart-" . htmlspecialchars($sanitizedInstructorName) . "').getContext('2d');
-                        var chart = new Chart(ctx, {
+                        new Chart(ctx, {
                             type: 'pie',
                             data: {
                                 labels: " . json_encode($courseTitles) . ",
