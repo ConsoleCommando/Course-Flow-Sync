@@ -38,5 +38,3 @@ EXPOSE 80
 
 # Start both NGINX and PHP-FPM
 CMD service nginx start && php-fpm
-
-RUN chmod +x /var/www/html/run-scraper-test.sh
