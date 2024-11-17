@@ -1,17 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
+
+<link rel="stylesheet" href="Page.css">
+
+<div class="header">  
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload JSON File</title>
+    <title>Course Flow Sync</title>
+<img src="Course-Flow-Sync-main\ProjectImages\UTC_logo.jpg" alt="">
+</div>
 </head>
 <body>
-    <h1>Upload JSON File</h1>
-    <form action="process.php" method="POST" enctype="multipart/form-data">
-        <label for="jsonFile">Choose JSON file:</label>
-        <input type="file" name="jsonFile" id="jsonFile" accept=".json" required>
-        <input type="submit" value="Upload and Insert Data">
+  
+<div class="container">
+ 
+    <h1>Welcome To Course Flow Sync</h1>
+	<div class="header p">
+      <p>This Platform is used to aid in searching the UTC registation.</p>
+    <p>Please complete to form below to see course details.</p>
+    </div>
+   </div>	
+  </div>
+
+  <div class="main-content">
+	<nav><a href="Goals.html">Project Goal</a></nav>
+  
+    
+  <div class="hero">
+    <h2>Enter A Term To Search Through:</h2>
+    <p>Please Enter a term including the semester and year. Ex: (Fall 2024)</p>
+    
+	
+	<form>
+        <label for="termSearch">Term Search:</label>
+        <input type="text" id="termSearch" name="termSearch"><br><br>
+        
+	<p>Please Enter the Subject you wish to search through. Ex:CPSC</p>
+        <label for="subjectSearch">Subject Search:</label>
+        <input type="text" id="subjectSearch" name="subjectSearch"><br><br>
+      
+	<div class="hero button">
+	
+	<button onclick="runPythonScript()">Begin Search</button></br>
+		
+		<script>
+
+            function runPythonScript() {
+
+                var xhr = new XMLHttpRequest();
+
+                xhr.open(“GET”, “selenium_scraper.py”, true);
+
+                xhr.send();
+            }
+            function fetchCall() {
+                fetch("process.php")
+                method: "post"
+                body: data
+            }
+            function fetchCall() {
+                    fetch("display.php")
+                    method: "post"
+                    body: data
+
+            }
+        
+
+		</script>
+	
+	
+	
+	</div>
     </form>
+    </div>
+</div>
+  
 </body>
 </html>
-
