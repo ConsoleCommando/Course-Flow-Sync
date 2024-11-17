@@ -6,22 +6,15 @@ from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from webdriver_manager.firefox import GeckoDriverManager
 
 pyperclip.set_clipboard("xclip")
 
 # Define the base URL with pageMaxSize set to a large value
 base_url = 'https://sis-reg.utc.edu/StudentRegistrationSsb/ssb/searchResults/searchResults?txt_subject=CPSC&txt_term=202440&startDatepicker=&endDatepicker=&uniqueSessionId={}&pageOffset=0&pageMaxSize=1000&sortColumn=subjectDescription&sortDirection=asc'
 
-# Set up Firefox options
-firefox_options = Options()
-
-# Path to geckodriver
-geckodriver_path = '/usr/local/bin/geckodriver'
-
-service = Service(geckodriver_path)
-
 # Start Firefox WebDriver with the service and options
-driver = webdriver.Firefox(service=service, options=firefox_options)
+driver = webdriver.Firefox(service=Service(GeckoDriverManager().install()))
 
 def get_unique_session_id(driver):
     # Extract uniqueSessionId from network resources.
