@@ -3,25 +3,37 @@ FROM php:8.3-fpm
 
 # Install system dependencies and PHP extensions
 RUN apt-get update && \
-    apt-get install -y libzip-dev unzip curl libpq-dev nginx firefox-esr wget gnupg xvfb xclip && \
-    docker-php-ext-install zip && \
-    docker-php-ext-install pdo pdo_mysql pdo_pgsql && \
+    apt-get install -y \
+    libzip-dev unzip curl libpq-dev python3 python3-pip python3-dev \
+    libgsf-1-114 libatk-bridge2.0-0 libgtk-3-0 libx11-xcb1 libgdk-pixbuf2.0-0 \
+    libgbm1 gnupg wget ca-certificates nginx libasound2 libnss3 libxshmfence1 \
+    fonts-liberation libu2f-udev libvulkan1 --no-install-recommends && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy the JDK folder from your local directory into the Docker container
+COPY java /opt/java
+
+# Set environment variables for Java
+ENV JAVA_HOME=/opt/java
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
+
+# Install PHP extensions and Composer
+RUN docker-php-ext-install zip pdo pdo_mysql pdo_pgsql && \
     pecl install mongodb && \
-    docker-php-ext-enable mongodb
+    docker-php-ext-enable mongodb && \
+    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# Install Selenium and BrowserMob Proxy
+RUN pip3 install selenium browsermob-proxy --break-system-packages
 
-# Install Selenium and related dependencies (including geckodriver)
-RUN wget https://github.com/mozilla/geckodriver/releases/download/v0.33.0/geckodriver-v0.33.0-linux64.tar.gz && \
-    tar -xvzf geckodriver-v0.33.0-linux64.tar.gz && \
-    mv geckodriver /usr/local/bin/
+# Install Google Chrome
+RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - && \
+    sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list' && \
+    apt-get update && \
+    apt-get install -y google-chrome-stable
 
-# Install Python and pip for Selenium and pyperclip
-RUN apt-get install -y python3 python3-pip && \
-    pip3 install selenium pyperclip --break-system-packages
-
-# Set the working directory for PHP
+# Set the working directory
 WORKDIR /var/www/html
 
 # Copy project files into the container
@@ -33,8 +45,11 @@ RUN composer install
 # Copy the NGINX configuration file
 COPY nginx.conf /etc/nginx/sites-available/default
 
-# Expose ports for NGINX and PHP-FPM
+# Expose port 80
 EXPOSE 80
 
-# Start both NGINX and PHP-FPM
+# Expose port 8080
+EXPOSE 8080
+
+# Start both PHP-FPM and NGINX using a shell script
 CMD service nginx start && php-fpm
