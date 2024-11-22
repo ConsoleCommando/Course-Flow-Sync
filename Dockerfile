@@ -11,8 +11,11 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy the JDK folder from your local directory into the Docker container
-COPY java /opt/java
+# Download and install OpenJDK 11
+RUN wget -O /tmp/openjdk.tar.gz https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.20+8/OpenJDK11U-jdk_x64_linux_hotspot_11.0.20_8.tar.gz && \
+    mkdir -p /opt/java && \
+    tar -xzf /tmp/openjdk.tar.gz -C /opt/java --strip-components=1 && \
+    rm /tmp/openjdk.tar.gz
 
 # Set environment variables for Java
 ENV JAVA_HOME=/opt/java
