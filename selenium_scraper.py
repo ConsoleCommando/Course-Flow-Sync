@@ -24,7 +24,7 @@ chrome_options.add_argument("--disable-gpu")
 chrome_options.add_argument("--disable-software-rasterizer")
 chrome_options.add_argument('--disable-dev-shm-usage') 
 
-# Specify the path to your ChromeDriver
+# Specify the path to ChromeDriver
 chrome_driver_path = './chromedriver'
 
 service = Service(chrome_driver_path)
@@ -125,7 +125,7 @@ print("Combining data from all pages...")
 combined_structure = {'data': []}
 
 # Specify the directory where the course data files are saved
-directory = '.'  # Assuming the JSON files are in the current directory
+directory = '.'  
 
 # Loop through each file in the directory
 for filename in os.listdir(directory):

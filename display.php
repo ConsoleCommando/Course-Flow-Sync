@@ -13,6 +13,7 @@
         <label for="instructor">Instructor Name:</label>
         <input type="text" id="instructor" name="instructor" placeholder="Enter instructor name" value="<?php echo htmlspecialchars($instructorFilter ?? '', ENT_QUOTES, 'UTF-8'); ?>">
         <input type="submit" value="Search">
+        <button type="button" onclick="window.location.href='index.html'">Go to Home</button>
     </form>
 
     <h1>Courses and Instructors</h1>

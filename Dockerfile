@@ -27,6 +27,12 @@ RUN docker-php-ext-install zip pdo pdo_mysql pdo_pgsql && \
     docker-php-ext-enable mongodb && \
     curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
+# Install Flask for Python
+RUN pip3 install flask --break-system-packages
+
+RUN pip3 install flask-cors --break-system-packages
+
+
 # Install Selenium and BrowserMob Proxy
 RUN pip3 install selenium browsermob-proxy --break-system-packages
 
@@ -48,11 +54,9 @@ RUN composer install
 # Copy the NGINX configuration file
 COPY nginx.conf /etc/nginx/sites-available/default
 
-# Expose port 80
+# Expose ports for NGINX and Flask
 EXPOSE 80
+EXPOSE 5000
 
-# Expose port 8080
-EXPOSE 8080
-
-# Start both PHP-FPM and NGINX using a shell script
-CMD service nginx start && php-fpm
+# Start PHP-FPM, NGINX, and Flask
+CMD service nginx start && php-fpm & python3 app.py

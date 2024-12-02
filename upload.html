@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload JSON File</title>
+    <style>
+        body {
+            background-color: #e9f0ff; 
+            color: #000; 
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-top: 20px;
+            color: #007bff;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        input[type="file"],
+        input[type="submit"],
+        button {
+            margin: 10px 5px;
+            padding: 8px 16px;
+            font-size: 16px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+        }
+
+        input[type="submit"] {
+            background-color: #007bff;
+            color: white;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Output area styling */
+        .output-area {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Upload JSON File</h1>
+    <form action="process.php" method="POST" enctype="multipart/form-data">
+        <label for="jsonFile">Choose JSON file:</label>
+        <input type="file" name="jsonFile" id="jsonFile" accept=".json" required>
+        <input type="submit" value="Upload and Insert Data">
+    </form>
+    
+    <div class="output-area">
+        <button onclick="window.location.href='index.html'">Go to Home</button>
+    </div>
+</body>
+</html>

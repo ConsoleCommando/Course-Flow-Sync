@@ -1,22 +1,22 @@
 /* Body styles */
 body {
-    background-color: #e9f0ff; /* Set a blue background color */
-    color: #000; /* Change text color for better contrast */
+    background-color: #e9f0ff; 
+    color: #000; 
 }
 
 /* General styles */
 h1 {
-    text-align: center; /* Center the header text */
-    margin-top: 20px; /* Add some margin */
+    text-align: center; 
+    margin-top: 20px; 
 }
 
 form {
-    text-align: center; /* Center the form elements */
-    margin-top: 20px; /* Add margin  */
+    text-align: center; 
+    margin-top: 20px; 
 }
 
-input[type="text"], input[type="submit"] {
-    display: inline-block; /* Align input and button inline */
+input[type="text"], input[type="submit"], button {
+    display: inline-block; 
 }
 
 /* Card styles */
@@ -27,14 +27,14 @@ input[type="text"], input[type="submit"] {
     margin: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     background-color: white;
-    width: 450px;  margins
-    min-height: 200px; /* Keep height */
-    box-sizing: border-box; /* Include padding and borders in width */
+    width: 450px;  
+    min-height: 200px; 
+    box-sizing: border-box; 
 }
 
 /* Card content */
 .card-content {
-    max-width: 100%; /* Ensures the card content does not exceed the card's width */
+    max-width: 100%; 
 }
 
 /* Table styles */
@@ -42,7 +42,7 @@ input[type="text"], input[type="submit"] {
     width: 100%;
     border-collapse: collapse;
     margin-top: 10px;
-    table-layout: auto; /* Adjust to auto for better resizing */
+    table-layout: auto; 
 }
 
 .card-content table th,
@@ -50,7 +50,7 @@ input[type="text"], input[type="submit"] {
     padding: 8px;
     border: 1px solid #ddd;
     text-align: left;
-    word-wrap: break-word; /* Breaks long words in the cells */
+    word-wrap: break-word; 
 }
 
 .card-content table th {
@@ -61,7 +61,7 @@ input[type="text"], input[type="submit"] {
 .chart-container {
     position: relative;
     height: auto;
-    min-height: 150px; /* Adjusted height */
+    min-height: 150px; 
     width: 100%;
     margin-top: 10px;
 }
@@ -70,7 +70,7 @@ input[type="text"], input[type="submit"] {
 .chartjs-legend ul {
     list-style-type: none;
     padding-left: 0;
-    text-align: left; /* Left-align the legend items */
+    text-align: left; 
 }
 
 .chartjs-legend ul li {
@@ -84,7 +84,7 @@ input[type="text"], input[type="submit"] {
     width: 12px;
     height: 12px;
     margin-right: 8px;
-    background-color: #000; /* Placeholder, overridden by Chart.js */
+    background-color: #000; 
 }
 
 /* Grid layout */
@@ -97,13 +97,16 @@ input[type="text"], input[type="submit"] {
 /* Form styles */
 form {
     margin-bottom: 20px;
-    text-align: center; /* Center the form elements */
+    text-align: center; 
 }
 
 input[type="text"],
-input[type="submit"] {
-    display: inline-block; /* Align input and button inline */
+input[type="submit"],
+button {
+    display: inline-block; 
     padding: 8px;
+    font-size: 16px;
+    line-height: 1; 
 }
 
 input[type="text"] {
@@ -111,7 +114,8 @@ input[type="text"] {
     margin-right: 10px;
 }
 
-input[type="submit"] {
+input[type="submit"],
+button {
     padding: 8px 16px;
     background-color: #007bff;
     color: white;
@@ -120,7 +124,7 @@ input[type="submit"] {
     cursor: pointer;
 }
 
-input[type="submit"]:hover {
-    background-color: #0056b3;
+input[type="submit"]:hover,
+button:hover {
+    background-color: #0056b3; 
 }
-

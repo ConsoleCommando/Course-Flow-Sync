@@ -1,17 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
+    <link rel="stylesheet" href="page.css">
+
+<div class="header">  
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload JSON File</title>
+    <title>Course Flow Sync</title>
+<img src="./UTC_logo.jpg" alt="">
+</div>
 </head>
 <body>
-    <h1>Upload JSON File</h1>
-    <form action="process.php" method="POST" enctype="multipart/form-data">
-        <label for="jsonFile">Choose JSON file:</label>
-        <input type="file" name="jsonFile" id="jsonFile" accept=".json" required>
-        <input type="submit" value="Upload and Insert Data">
-    </form>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            margin-top: 20%;
+        }
+        .button {
+            display: inline-block;
+            padding: 15px 30px;
+            margin: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="upload.html" class="button">Upload</a>
+        <a href="display.php" class="button">Display</a>
+        <a href="run-scraper.html" class="button">Run Scraper</a>
+    </div>
 </body>
 </html>
 
