@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Run Python Script</title>
+    <style>
+        /* General page styling */
+        body {
+            background-color: #e9f0ff;
+            font-family: Arial, sans-serif;
+            color: #000;
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-top: 20px;
+            color: #007bff;
+        }
+
+        button {
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* For the output area */
+        pre {
+            background-color: #f1f1f1;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            width: 80%;
+            margin: 20px auto;
+            text-align: left;
+        }
+    </style>
+    <script>
+        async function runScript() {
+            const button = document.getElementById('runButton');
+            button.disabled = true;
+            button.innerText = 'Please wait...';
+
+            try {
+                const response = await fetch('http://localhost:5000/run-scraper', { method: 'POST' });
+                const data = await response.json();
+
+                if (data.success) {
+                    window.location.href = 'upload.html';
+                } else {
+                    document.getElementById('output').innerText = `Error:\n${data.error}`;
+                }
+            } catch (error) {
+                document.getElementById('output').innerText = `Error:\n${error.message}`;
+            } finally {
+                button.disabled = false;
+                button.innerText = 'Run Script';
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Run Python Script in Docker</h1>
+    <button id="runButton" onclick="runScript()">Run Script</button>
+    <pre id="output"></pre>
+
+    <button onclick="window.location.href='index.html'">Go to Home</button>
+</body>
+</html>

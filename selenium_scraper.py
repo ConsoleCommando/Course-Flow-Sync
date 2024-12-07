@@ -1,36 +1,39 @@
-import time
-import pyperclip
 from selenium import webdriver
-from selenium.webdriver.firefox.service import Service
-from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from browsermobproxy import Server
+import time
+import json
+import os
 
-pyperclip.set_clipboard("xclip")
+# Start BrowserMob Proxy
+browsermob_binary_path = './browsermob-proxy/bin/browsermob-proxy'
+server = Server(browsermob_binary_path)
+server.start()
+proxy = server.create_proxy()
 
-# Define the base URL with pageMaxSize set to a large value
-base_url = 'https://sis-reg.utc.edu/StudentRegistrationSsb/ssb/searchResults/searchResults?txt_subject=CPSC&txt_term=202440&startDatepicker=&endDatepicker=&uniqueSessionId={}&pageOffset=0&pageMaxSize=1000&sortColumn=subjectDescription&sortDirection=asc'
+# Set up Selenium WebDriver to use the Proxy
+chrome_options = webdriver.ChromeOptions()
+chrome_options.add_argument(f'--proxy-server={proxy.proxy}')
+chrome_options.add_argument('--ignore-certificate-errors')
+chrome_options.add_argument('--headless')
+chrome_options.add_argument('--no-sandbox')  
+chrome_options.add_argument("--disable-gpu")
+chrome_options.add_argument("--disable-software-rasterizer")
+chrome_options.add_argument('--disable-dev-shm-usage') 
 
-# Set up Firefox options
-firefox_options = Options()
+# Specify the path to ChromeDriver
+chrome_driver_path = './chromedriver'
 
-# Path to geckodriver
-geckodriver_path = '/usr/local/bin/geckodriver'
+service = Service(chrome_driver_path)
 
-service = Service(geckodriver_path)
+# Start the Chrome WebDriver
+driver = webdriver.Chrome(service=service, options=chrome_options)
 
-# Start Firefox WebDriver with the service and options
-driver = webdriver.Firefox(service=service, options=firefox_options)
-
-def get_unique_session_id(driver):
-    # Extract uniqueSessionId from network resources.
-    har_data = driver.execute_script("return window.performance.getEntriesByType('resource');")
-    for entry in har_data:
-        request_url = entry['name']
-        if 'uniqueSessionId' in request_url:
-            return request_url.split('uniqueSessionId=')[1].split('&')[0]
-    return None
+# Enable proxy to capture the network traffic
+proxy.new_har("course_flow", options={'captureHeaders': True, 'captureContent': True})
 
 # Go to the registration page
 url = 'https://sis-reg.utc.edu/StudentRegistrationSsb/ssb/registration'
@@ -70,43 +73,87 @@ search_button.click()
 # Wait for the search results page to load
 time.sleep(2)
 
-# Extract uniqueSessionId from network traffic
-unique_session_id = get_unique_session_id(driver)
+# Initialize a list to store all data
+all_data = []
 
-# If we found the uniqueSessionId, construct the URL and navigate to it in Selenium
-if unique_session_id:
-    full_url = base_url.format(unique_session_id, 0)
-    print(f"Using URL: {full_url}")
-    
-    # Use Selenium to navigate to the full URL
-    driver.get(full_url)
-else:
-    print("uniqueSessionId not found.")
+# Loop to get all pages
+page_number = 1  # Start with page 1
+while True:
+    # Get the captured HAR (HTTP Archive) data from BrowserMob Proxy
+    har_data = proxy.har
 
-# Find and click the "Copy" button
-copy_button = WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'btn.copy')))
-copy_button.click()
+    # Flag to track if we found the new page's data
+    page_data_found = False
 
-# Wait for the content to be copied to the clipboard
-time.sleep(1)
+    # Extract data from the HAR logs
+    for entry in har_data['log']['entries']:
+        request_url = entry['request']['url']
+        mime_type = entry['response']['content']['mimeType']
+        
+        # Only process the response that contains search results
+        if 'searchResults' in request_url and mime_type == 'application/json;charset=UTF-8':
+            json_data = entry['response']['content']['text']
+            print("Found JSON Data")
+            page_data_found = True  # Mark that we have found the new page's data
+            page_data = json.loads(json_data)  # Extract the data for this page
 
-# Retrieve the copied data from the clipboard using pyperclip
-copied_data = pyperclip.paste()
+            # Only extract the 'data' array and add it to the all_data list
+            if 'data' in page_data:
+                all_data.extend(page_data['data'])  # Add the 'data' array to the overall data array
 
-# Format the data as JSON (assuming it's in a JSON-compatible format)
-import json
-try:
-    json_data = json.loads(copied_data)
-    
-    # Define the path for saving the JSON file
-    json_file_path = 'course_data.json'  # Save in the same directory as the script
+    # If new data is found, save it to a new file
+    if page_data_found:
+        file_name = f'course_data_page_{page_number}.json'  # Create a unique file name for each page
+        with open(file_name, 'w') as json_file:
+            json.dump(page_data, json_file, indent=4)
+        print(f"Page data saved to '{file_name}'")
 
-    # Save the formatted JSON to the file
-    with open(json_file_path, 'w') as json_file:
-        json.dump(json_data, json_file, indent=4)
-    print(f"Data saved to {json_file_path}")
-except json.JSONDecodeError:
-    print("The copied data is not valid JSON.")
+    # Try to find the 'Next' button to move to the next page
+    try:
+        next_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, 'paging-control.next.ltr.enabled')))
+        next_button.click()  # Click the 'Next' button
+        time.sleep(2)  # Wait for the next page to load
+        page_number += 1  # Increment the page number for the next file
+    except:
+        print("No more pages to scrape.")
+        break  # Exit the loop if no 'Next' button is found
 
-# Close the browser
+# After scraping all pages, combine the data from the saved files
+print("Combining data from all pages...")
+
+# Initialize a dictionary for the combined structure with a 'data' array
+combined_structure = {'data': []}
+
+# Specify the directory where the course data files are saved
+directory = '.'  
+
+# Loop through each file in the directory
+for filename in os.listdir(directory):
+    if filename.endswith('.json') and filename.startswith('course_data_page_'):
+        # Open each individual file
+        with open(os.path.join(directory, filename), 'r') as file:
+            # Load the full JSON data from the file
+            page_data = json.load(file)
+            
+            # Extract the 'data' array and add it to the combined structure
+            if 'data' in page_data:
+                combined_structure['data'].extend(page_data['data'])  # Combine 'data' arrays
+
+# Write the combined structure with 'data' array to a new JSON file
+with open('course_data.json', 'w') as combined_file:
+    json.dump(combined_structure, combined_file, indent=4)
+
+print("All 'data' arrays combined into 'course_data.json' with the 'data' array structure.")
+
+# Delete all individual page JSON files except the combined one
+for filename in os.listdir(directory):
+    if filename.endswith('.json') and filename.startswith('course_data_page_'):
+        try:
+            os.remove(os.path.join(directory, filename))
+            print(f"Deleted {filename}")
+        except Exception as e:
+            print(f"Error deleting {filename}: {e}")
+
+# Close the browser and stop the proxy
 driver.quit()
+server.stop()

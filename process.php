@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['jsonFile'])) {
     $instructorsCollection = $db->instructors;
 
     try {
-        // Clear existing collections (optional)
+        // Clear existing collections
         $coursesCollection->drop();
         $instructorsCollection->drop();
 

@@ -13,10 +13,10 @@ services:
     depends_on:
       - mongodb
     ports:
-      - "80:80"
+      - "80:80"      # Exposing port 80 for NGINX
+      - "5000:5000"  # Exposing port 5000 for Flask
     volumes:
       - .:/var/www/html
 
 volumes:
   mongo_data:
-
